@@ -7,6 +7,8 @@ import {
   signupSchema,
   loginSchema,
   refreshTokenSchema,
+  verifyOTPSchema,
+  resendOTPSchema,
 } from '../utils/validators.js';
 
 const router = Router();
@@ -17,6 +19,20 @@ router.post(
   authLimiter,
   validate(signupSchema),
   authController.signup
+);
+
+router.post(
+  '/verify-otp',
+  authLimiter,
+  validate(verifyOTPSchema),
+  authController.verifyOTP
+);
+
+router.post(
+  '/resend-otp',
+  authLimiter,
+  validate(resendOTPSchema),
+  authController.resendOTP
 );
 
 router.post(

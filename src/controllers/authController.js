@@ -3,7 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 /**
  * POST /api/auth/signup
- * Register a new user
+ * Register a new user and send OTP for verification
  */
 export const signup = asyncHandler(async (req, res) => {
   const { email, password, name } = req.body;
@@ -12,11 +12,48 @@ export const signup = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: 'User registered successfully',
+    message: result.message,
+    data: {
+      email: result.email,
+      requiresVerification: result.requiresVerification,
+    },
+  });
+});
+
+/**
+ * POST /api/auth/verify-otp
+ * Verify user's email with OTP
+ */
+export const verifyOTP = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  const result = await authService.verifyOTP(email, otp);
+
+  res.status(200).json({
+    success: true,
+    message: 'Email verified successfully',
     data: {
       user: result.user,
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
+    },
+  });
+});
+
+/**
+ * POST /api/auth/resend-otp
+ * Resend OTP to user's email
+ */
+export const resendOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const result = await authService.resendOTP(email);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+    data: {
+      email: result.email,
     },
   });
 });
@@ -89,4 +126,6 @@ export default {
   refreshToken,
   logout,
   getProfile,
+  verifyOTP,
+  resendOTP,
 };

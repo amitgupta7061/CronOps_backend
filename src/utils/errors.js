@@ -12,14 +12,16 @@ export class AppError extends Error {
 }
 
 export class BadRequestError extends AppError {
-  constructor(message = 'Bad request') {
+  constructor(message = 'Bad request', data = null) {
     super(message, 400);
+    this.data = data;
   }
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message = 'Unauthorized') {
+  constructor(message = 'Unauthorized', data = null) {
     super(message, 401);
+    this.data = data;
   }
 }
 

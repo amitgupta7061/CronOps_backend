@@ -29,6 +29,19 @@ export const config = {
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   },
+
+  email: {
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT, 10) || 587,
+    secure: process.env.EMAIL_SECURE === 'true',
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    from: process.env.EMAIL_FROM || '"CronOps" <noreply@cronops.com>',
+  },
+
+  otp: {
+    expiryMinutes: parseInt(process.env.OTP_EXPIRY_MINUTES, 10) || 10,
+  },
 };
 
 // Validate required environment variables

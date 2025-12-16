@@ -38,6 +38,11 @@ export const errorHandler = (err, req, res, next) => {
       response.errors = err.errors;
     }
 
+    // Include additional data if present (e.g., for verification required)
+    if (err.data) {
+      response.data = err.data;
+    }
+
     return res.status(err.statusCode).json(response);
   }
 

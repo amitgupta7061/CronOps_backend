@@ -23,6 +23,19 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
+// OTP validation schemas
+export const verifyOTPSchema = z.object({
+  email: z.email('Invalid email address'),
+  otp: z
+    .string()
+    .length(6, 'OTP must be 6 digits')
+    .regex(/^\d{6}$/, 'OTP must contain only digits'),
+});
+
+export const resendOTPSchema = z.object({
+  email: z.email('Invalid email address'),
+});
+
 // Cron job validation schemas
 export const createCronJobSchema = z.object({
   name: z
