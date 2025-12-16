@@ -1,0 +1,45 @@
+{
+  "name": "cronops-backend",
+  "version": "1.0.0",
+  "description": "Production-ready Cron Job Scheduling Platform Backend",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/server.js",
+    "start": "NODE_ENV=production bun src/server.js",
+    "worker": "bun src/workers/cronWorker.js",
+    "worker:dev": "bun --watch src/workers/cronWorker.js",
+    "db:generate": "bunx prisma generate",
+    "db:migrate": "bunx prisma migrate dev",
+    "db:migrate:prod": "bunx prisma migrate deploy",
+    "db:push": "bunx prisma db push",
+    "db:seed": "bun src/prisma/seed.js",
+    "db:studio": "bunx prisma studio",
+    "lint": "eslint src/",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.1.0",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.66.0",
+    "cors": "^2.8.5",
+    "cron-parser": "^5.4.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.8.2",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.3",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "prisma": "^7.1.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
