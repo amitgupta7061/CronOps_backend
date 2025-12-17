@@ -17,7 +17,7 @@ export const apiLimiter = rateLimit({
 // Stricter rate limiter for auth endpoints
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 10, // 10 requests per window
+  limit: 50, // 50 requests per window
   message: {
     success: false,
     status: 'fail',
@@ -31,7 +31,7 @@ export const authLimiter = rateLimit({
 // Rate limiter for job creation
 export const jobCreationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  limit: 50, // 50 jobs per hour
+  limit: 100, // 100 jobs per hour
   message: {
     success: false,
     status: 'fail',
