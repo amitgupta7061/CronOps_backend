@@ -1,4 +1,4 @@
-import cronParser from 'cron-parser';
+import { CronExpressionParser } from 'cron-parser';
 import { BadRequestError } from './errors.js';
 
 /**
@@ -10,7 +10,7 @@ import { BadRequestError } from './errors.js';
  */
 export function validateCronExpression(expression, timezone = 'UTC') {
   try {
-    cronParser.parseExpression(expression, { tz: timezone });
+    CronExpressionParser.parse(expression, { tz: timezone });
     return true;
   } catch (error) {
     throw new BadRequestError(`Invalid cron expression: ${error.message}`);
@@ -25,7 +25,7 @@ export function validateCronExpression(expression, timezone = 'UTC') {
  */
 export function getNextExecution(expression, timezone = 'UTC') {
   try {
-    const interval = cronParser.parseExpression(expression, { tz: timezone });
+    const interval = CronExpressionParser.parse(expression, { tz: timezone });
     return interval.next().toDate();
   } catch (error) {
     return null;
@@ -40,7 +40,7 @@ export function getNextExecution(expression, timezone = 'UTC') {
  */
 export function getPreviousExecution(expression, timezone = 'UTC') {
   try {
-    const interval = cronParser.parseExpression(expression, { tz: timezone });
+    const interval = CronExpressionParser.parse(expression, { tz: timezone });
     return interval.prev().toDate();
   } catch (error) {
     return null;

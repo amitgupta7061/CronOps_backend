@@ -2,6 +2,29 @@ import executionLogService from '../services/executionLogService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 /**
+ * GET /api/logs
+ * Get all execution logs for the authenticated user
+ */
+export const getAllLogs = asyncHandler(async (req, res) => {
+  const { page, limit, status, jobId } = req.query;
+
+  const result = await executionLogService.getAllUserLogs(
+    req.user.id,
+    {
+      page: parseInt(page) || 1,
+      limit: parseInt(limit) || 20,
+      status,
+      jobId,
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
+/**
  * GET /api/jobs/:jobId/logs
  * Get execution logs for a specific job
  */
@@ -71,6 +94,7 @@ export const getUserStats = asyncHandler(async (req, res) => {
 });
 
 export default {
+  getAllLogs,
   getJobLogs,
   getLogById,
   getJobStats,

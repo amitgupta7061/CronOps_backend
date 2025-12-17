@@ -9,7 +9,9 @@ export const validate = (schema, source = 'body') => {
   return async (req, res, next) => {
     try {
       const data = await schema.parseAsync(req[source]);
-      req[source] = data; // Replace with parsed/transformed data
+      // Use Object.assign instead of direct assignment to avoid readonly property errors
+      Object.keys(req[source]).forEach(key => delete req[source][key]);
+      Object.assign(req[source], data);
       next();
     } catch (error) {
       next(error); // Let error handler deal with ZodError
@@ -29,7 +31,8 @@ export const validateRequest = (schemas) => {
       if (schemas.body) {
         validations.push(
           schemas.body.parseAsync(req.body).then((data) => {
-            req.body = data;
+            Object.keys(req.body).forEach(key => delete req.body[key]);
+            Object.assign(req.body, data);
           })
         );
       }
@@ -37,7 +40,8 @@ export const validateRequest = (schemas) => {
       if (schemas.query) {
         validations.push(
           schemas.query.parseAsync(req.query).then((data) => {
-            req.query = data;
+            Object.keys(req.query).forEach(key => delete req.query[key]);
+            Object.assign(req.query, data);
           })
         );
       }
@@ -45,7 +49,8 @@ export const validateRequest = (schemas) => {
       if (schemas.params) {
         validations.push(
           schemas.params.parseAsync(req.params).then((data) => {
-            req.params = data;
+            Object.keys(req.params).forEach(key => delete req.params[key]);
+            Object.assign(req.params, data);
           })
         );
       }

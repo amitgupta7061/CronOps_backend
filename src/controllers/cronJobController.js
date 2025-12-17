@@ -30,8 +30,10 @@ export const getJobs = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    data: result.jobs,
-    pagination: result.pagination,
+    data: {
+      jobs: result.jobs,
+      pagination: result.pagination,
+    },
   });
 });
 
@@ -107,6 +109,20 @@ export const resumeJob = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * POST /api/jobs/:id/run
+ * Run a cron job immediately
+ */
+export const runJobNow = asyncHandler(async (req, res) => {
+  const job = await cronJobService.runJobNow(req.user.id, req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Cron job queued for immediate execution',
+    data: job,
+  });
+});
+
 export default {
   createJob,
   getJobs,
@@ -115,4 +131,5 @@ export default {
   deleteJob,
   pauseJob,
   resumeJob,
+  runJobNow,
 };

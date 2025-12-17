@@ -43,6 +43,7 @@ router.delete('/:id', cronJobController.deleteJob);
 // Job control operations
 router.post('/:id/pause', cronJobController.pauseJob);
 router.post('/:id/resume', cronJobController.resumeJob);
+router.post('/:id/run', cronJobController.runJobNow);
 
 // Execution logs for a specific job
 router.get(

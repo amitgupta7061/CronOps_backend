@@ -199,6 +199,55 @@ export async function getUserStatistics(userId) {
 }
 
 /**
+ * Gets all execution logs for a user across all jobs
+ */
+export async function getAllUserLogs(
+  userId,
+  { page = 1, limit = 20, status, jobId } = {}
+) {
+  // Get all jobs owned by the user
+  const userJobs = await prisma.cronJob.findMany({
+    where: { userId },
+    select: { id: true },
+  });
+
+  const jobIds = userJobs.map((job) => job.id);
+
+  const where = { jobId: { in: jobIds } };
+  if (status) {
+    where.status = status;
+  }
+  if (jobId) {
+    where.jobId = jobId;
+  }
+
+  const [logs, total] = await Promise.all([
+    prisma.executionLog.findMany({
+      where,
+      include: {
+        cronJob: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: { startedAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.executionLog.count({ where }),
+  ]);
+
+  return {
+    logs,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+/**
  * Deletes old execution logs (for maintenance)
  */
 export async function deleteOldExecutionLogs(daysToKeep = 30) {
@@ -219,6 +268,7 @@ export async function deleteOldExecutionLogs(daysToKeep = 30) {
 export default {
   createExecutionLog,
   getExecutionLogs,
+  getAllUserLogs,
   getExecutionLogById,
   getJobStatistics,
   getUserStatistics,

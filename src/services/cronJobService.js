@@ -269,6 +269,35 @@ export async function syncActiveJobsToQueue() {
   return activeJobs.length;
 }
 
+/**
+ * Triggers immediate execution of a cron job
+ */
+export async function runJobNow(userId, jobId) {
+  const job = await getCronJobById(userId, jobId);
+
+  // Add a one-time job to the queue for immediate execution
+  await cronQueue.add(
+    `immediate-${job.id}`,
+    {
+      cronJobId: job.id,
+      targetType: job.targetType,
+      targetUrl: job.targetUrl,
+      command: job.command,
+      headers: job.headers,
+      httpMethod: job.httpMethod,
+      payload: job.payload,
+      timeout: job.timeout,
+      maxRetries: job.maxRetries,
+    },
+    {
+      removeOnComplete: true,
+      removeOnFail: false,
+    }
+  );
+
+  return job;
+}
+
 export default {
   createCronJob,
   getCronJobs,
@@ -278,4 +307,5 @@ export default {
   pauseCronJob,
   resumeCronJob,
   syncActiveJobsToQueue,
+  runJobNow,
 };
