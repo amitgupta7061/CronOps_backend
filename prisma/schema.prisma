@@ -15,6 +15,7 @@ model User {
   password     String
   name         String?
   role         Role      @default(USER)
+  plan         Plan      @default(FREE)
   refreshToken String?
   isVerified   Boolean   @default(false)
   otp          String?
@@ -102,4 +103,10 @@ enum ExecutionStatus {
   FAILED
   RUNNING
   TIMEOUT
+}
+
+enum Plan {
+  FREE
+  PREMIUM
+  PRO
 }
