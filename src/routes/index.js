@@ -3,6 +3,7 @@ import authRoutes from './authRoutes.js';
 import jobRoutes from './jobRoutes.js';
 import logRoutes from './logRoutes.js';
 import statsRoutes from './statsRoutes.js';
+import adminRoutes from './adminRoutes.js';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/auth', authRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/logs', logRoutes);
 router.use('/stats', statsRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

@@ -140,6 +140,7 @@ export async function verifyOTP(email, otp) {
       id: true,
       email: true,
       name: true,
+      role: true,
       createdAt: true,
     },
   });
@@ -249,6 +250,7 @@ export async function login(email, password) {
       id: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
       createdAt: user.createdAt,
     },
     ...tokens,
@@ -312,6 +314,7 @@ export async function getProfile(userId) {
       id: true,
       email: true,
       name: true,
+      role: true,
       createdAt: true,
       updatedAt: true,
     },
