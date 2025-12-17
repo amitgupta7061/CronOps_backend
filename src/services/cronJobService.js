@@ -10,6 +10,32 @@ export async function createCronJob(userId, data) {
   // Validate cron expression
   validateCronExpression(data.cronExpression, data.timezone);
 
+  // Check job limits based on plan
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { plan: true, role: true },
+  });
+
+  if (user.role !== 'ADMIN') {
+    const jobCount = await prisma.cronJob.count({
+      where: { userId },
+    });
+
+    const limits = {
+      FREE: 3,
+      PREMIUM: 100,
+      PRO: Infinity,
+    };
+
+    const limit = limits[user.plan] || 3;
+
+    if (jobCount >= limit) {
+      throw new ForbiddenError(
+        `You have reached the limit of ${limit} jobs for your ${user.plan} plan. Please upgrade to create more jobs.`
+      );
+    }
+  }
+
   const cronJob = await prisma.cronJob.create({
     data: {
       userId,
