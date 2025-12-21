@@ -356,7 +356,7 @@ export async function forgotPassword(email) {
 
   // Generate reset token
   const resetToken = generateResetToken();
-  const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+  const resetTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
   // Store hashed token
   await prisma.user.update({
