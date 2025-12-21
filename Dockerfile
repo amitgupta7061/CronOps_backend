@@ -11,24 +11,27 @@ RUN bun install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Prisma generate needs DATABASE_URL but doesn't actually connect during generate
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN bunx prisma generate
 
 # Production stage
 FROM base AS runner
 ENV NODE_ENV=production
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 cronops
-
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/docker-entrypoint.sh ./
 
-USER cronops
+# Make entrypoint executable
+RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 3000
 
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["bun", "src/server.js"]
+
+

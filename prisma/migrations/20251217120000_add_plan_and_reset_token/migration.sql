@@ -1,0 +1,7 @@
+-- CreateEnum
+CREATE TYPE "Plan" AS ENUM ('FREE', 'PREMIUM', 'PRO');
+
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "plan" "Plan" NOT NULL DEFAULT 'FREE';
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "resetToken" TEXT;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "resetTokenExpiresAt" TIMESTAMP(3);
