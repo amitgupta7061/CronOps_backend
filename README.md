@@ -5,9 +5,14 @@ A production-ready multi-user Cron Job Scheduling platform built with Node.js, E
 ## Features
 
 - 🔐 **JWT Authentication** - Secure access and refresh token system
+- 📧 **Email Verification** - OTP-based email verification for signups
+- 🔑 **Password Reset** - Secure token-based password reset flow
 - ⏰ **Cron Job Management** - Create, update, delete, pause/resume cron jobs
 - 🚀 **Job Scheduling** - Redis-backed BullMQ for reliable scheduling
 - 📊 **Execution Logs** - Detailed logs with statistics
+- 📈 **Analytics** - Execution trends, success rates, and hourly distribution
+- 💎 **Subscription Plans** - FREE, PREMIUM, PRO tiers with job limits
+- 🛡️ **Admin APIs** - User management, system stats, and oversight
 - 🔒 **Security** - Rate limiting, Helmet, CORS, input validation with Zod 4
 - 🐳 **Docker Ready** - Full Docker and docker-compose setup
 
@@ -94,10 +99,16 @@ bun run worker:dev
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/verify` | Verify email with OTP |
+| POST | `/api/auth/resend-verification` | Resend verification OTP |
 | POST | `/api/auth/login` | Login and get tokens |
 | POST | `/api/auth/refresh` | Refresh access token |
 | POST | `/api/auth/logout` | Logout (invalidate refresh token) |
+| POST | `/api/auth/forgot-password` | Request password reset email |
+| POST | `/api/auth/reset-password` | Reset password with token |
 | GET | `/api/auth/me` | Get current user profile |
+| PUT | `/api/auth/profile` | Update user profile |
+| PUT | `/api/auth/change-password` | Change password |
 
 ### Cron Jobs
 
@@ -110,20 +121,40 @@ bun run worker:dev
 | DELETE | `/api/jobs/:id` | Delete a job |
 | POST | `/api/jobs/:id/pause` | Pause a job |
 | POST | `/api/jobs/:id/resume` | Resume a job |
+| POST | `/api/jobs/:id/run` | Execute job immediately |
 
 ### Execution Logs
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/jobs/:jobId/logs` | Get logs for a job |
-| GET | `/api/jobs/:jobId/stats` | Get statistics for a job |
+| GET | `/api/logs` | Get all logs (paginated) |
 | GET | `/api/logs/:id` | Get log by ID |
+| GET | `/api/jobs/:jobId/logs` | Get logs for a specific job |
 
-### Statistics
+### Statistics & Analytics
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/stats` | Get user dashboard statistics |
+| GET | `/api/stats/analytics` | Get analytics (trends, hourly distribution) |
+
+### Users
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/api/users/plan` | Update subscription plan |
+
+### Admin (requires ADMIN role)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/stats` | Get system-wide statistics |
+| GET | `/api/admin/analytics` | Get system-wide analytics |
+| GET | `/api/admin/users` | List all users |
+| PUT | `/api/admin/users/:id/role` | Update user role |
+| DELETE | `/api/admin/users/:id` | Delete a user |
+| GET | `/api/admin/jobs` | List all jobs across users |
+| GET | `/api/admin/logs` | List all execution logs |
 
 ### Health
 
@@ -206,7 +237,7 @@ src/
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `NODE_ENV` | Environment | development |
-| `PORT` | Server port | 3000 |
+| `PORT` | Server port | 3001 |
 | `DATABASE_URL` | PostgreSQL connection URL | - |
 | `REDIS_HOST` | Redis host | localhost |
 | `REDIS_PORT` | Redis port | 6379 |
@@ -215,9 +246,15 @@ src/
 | `JWT_REFRESH_SECRET` | JWT refresh token secret | - |
 | `JWT_ACCESS_EXPIRES_IN` | Access token expiry | 15m |
 | `JWT_REFRESH_EXPIRES_IN` | Refresh token expiry | 7d |
+| `EMAIL_HOST` | SMTP server host | - |
+| `EMAIL_PORT` | SMTP server port | 587 |
+| `EMAIL_USER` | SMTP username | - |
+| `EMAIL_PASS` | SMTP password | - |
+| `EMAIL_FROM` | From email address | - |
+| `FRONTEND_URL` | Frontend URL for email links | http://localhost:3000 |
 | `RATE_LIMIT_WINDOW_MS` | Rate limit window | 900000 |
 | `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | 100 |
-| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:5173 |
+| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:3000 |
 
 ## Scripts
 
