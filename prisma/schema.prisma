@@ -10,18 +10,20 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  password     String
-  name         String?
-  role         Role      @default(USER)
-  plan         Plan      @default(FREE)
-  refreshToken String?
-  isVerified   Boolean   @default(false)
-  otp          String?
-  otpExpiresAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  password              String
+  name                  String?
+  role                  Role      @default(USER)
+  plan                  Plan      @default(FREE)
+  refreshToken          String?
+  isVerified            Boolean   @default(false)
+  otp                   String?
+  otpExpiresAt          DateTime?
+  resetToken            String?   // Password reset token
+  resetTokenExpiresAt   DateTime? // Password reset token expiry
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   cronJobs CronJob[]
 

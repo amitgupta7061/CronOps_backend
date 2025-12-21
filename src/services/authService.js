@@ -327,6 +327,125 @@ export async function getProfile(userId) {
   return user;
 }
 
+/**
+ * Generates a secure random token for password reset
+ */
+function generateResetToken() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < 64; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
+/**
+ * Initiates password reset by sending email with reset token
+ */
+export async function forgotPassword(email) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  // Don't reveal if user exists or not for security
+  if (!user) {
+    return {
+      message: 'If an account exists with this email, you will receive a password reset link.',
+    };
+  }
+
+  // Generate reset token
+  const resetToken = generateResetToken();
+  const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+
+  // Store hashed token
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      resetToken,
+      resetTokenExpiresAt,
+    },
+  });
+
+  // Send password reset email
+  const { sendPasswordResetEmail } = await import('./emailService.js');
+  await sendPasswordResetEmail(email, resetToken, user.name);
+
+  return {
+    message: 'If an account exists with this email, you will receive a password reset link.',
+  };
+}
+
+/**
+ * Resets user password using reset token
+ */
+export async function resetPassword(token, newPassword) {
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiresAt: {
+        gt: new Date(),
+      },
+    },
+  });
+
+  if (!user) {
+    throw new BadRequestError('Invalid or expired reset token');
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  // Update password and clear reset token
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpiresAt: null,
+      refreshToken: null, // Invalidate all sessions
+    },
+  });
+
+  return {
+    message: 'Password reset successfully. Please login with your new password.',
+  };
+}
+
+/**
+ * Change password for authenticated user
+ */
+export async function changePassword(userId, currentPassword, newPassword) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  // Verify current password
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw new BadRequestError('Current password is incorrect');
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  // Update password
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      password: hashedPassword,
+    },
+  });
+
+  return {
+    message: 'Password changed successfully.',
+  };
+}
+
 export default {
   signup,
   verifyOTP,
@@ -335,4 +454,9 @@ export default {
   refreshAccessToken,
   logout,
   getProfile,
+  forgotPassword,
+  resetPassword,
+  changePassword,
 };
+
+

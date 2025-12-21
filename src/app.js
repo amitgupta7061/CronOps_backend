@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import { config } from './utils/config.js';
 import routes from './routes/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 import { logger } from './utils/logger.js';
+import swaggerDocument from './utils/swagger.js';
 
 const app = express();
 
@@ -38,6 +40,12 @@ if (config.env === 'development') {
   });
 }
 
+// Swagger API Documentation
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'CronOps API Documentation',
+}));
+
 // API routes
 app.use('/api', routes);
 
@@ -47,7 +55,7 @@ app.get('/', (req, res) => {
     success: true,
     message: 'CronOps API',
     version: '1.0.0',
-    docs: '/api/health',
+    docs: '/api/docs',
   });
 });
 
@@ -58,3 +66,4 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 export default app;
+

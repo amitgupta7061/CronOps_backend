@@ -9,6 +9,9 @@ import {
   refreshTokenSchema,
   verifyOTPSchema,
   resendOTPSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
 } from '../utils/validators.js';
 
 const router = Router();
@@ -48,8 +51,31 @@ router.post(
   authController.refreshToken
 );
 
+// Password reset routes
+router.post(
+  '/forgot-password',
+  authLimiter,
+  validate(forgotPasswordSchema),
+  authController.forgotPassword
+);
+
+router.post(
+  '/reset-password',
+  authLimiter,
+  validate(resetPasswordSchema),
+  authController.resetPassword
+);
+
 // Protected routes
 router.post('/logout', authenticate, authController.logout);
 router.get('/me', authenticate, authController.getProfile);
+router.put(
+  '/password',
+  authenticate,
+  validate(changePasswordSchema),
+  authController.changePassword
+);
 
 export default router;
+
+

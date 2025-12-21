@@ -3,6 +3,7 @@ import { Worker } from 'bullmq';
 import axios from 'axios';
 import { createRedisConnection } from '../jobs/redis.js';
 import { QUEUE_NAMES } from '../jobs/queue.js';
+import { CLEANUP_QUEUE_NAME, processCleanupJob } from '../jobs/cleanupJob.js';
 import prisma from '../prisma/client.js';
 import { logger } from '../utils/logger.js';
 
@@ -179,8 +180,9 @@ worker.on('error', (error) => {
 
 // Graceful shutdown
 async function shutdown() {
-  logger.info('Shutting down worker...');
+  logger.info('Shutting down workers...');
   await worker.close();
+  await cleanupWorker.close();
   await prisma.$disconnect();
   process.exit(0);
 }
@@ -192,3 +194,26 @@ logger.info('Cron worker started', {
   queueName: QUEUE_NAMES.CRON_JOBS,
   concurrency: 10,
 });
+
+// Create cleanup worker
+const cleanupWorker = new Worker(
+  CLEANUP_QUEUE_NAME,
+  async (job) => {
+    return processCleanupJob(job);
+  },
+  {
+    connection: createRedisConnection(),
+    concurrency: 1,
+  }
+);
+
+cleanupWorker.on('completed', (job, result) => {
+  logger.info('Cleanup job completed', { deletedCount: result?.deletedCount });
+});
+
+cleanupWorker.on('failed', (job, error) => {
+  logger.error('Cleanup job failed', { error: error.message });
+});
+
+logger.info('Cleanup worker started', { queueName: CLEANUP_QUEUE_NAME });
+

@@ -120,6 +120,51 @@ export const getProfile = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * POST /api/auth/forgot-password
+ * Send password reset email
+ */
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const result = await authService.forgotPassword(email);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+  });
+});
+
+/**
+ * POST /api/auth/reset-password
+ * Reset password using token
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+
+  const result = await authService.resetPassword(token, password);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+  });
+});
+
+/**
+ * PUT /api/auth/password
+ * Change password for authenticated user
+ */
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const result = await authService.changePassword(req.user.id, currentPassword, newPassword);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+  });
+});
+
 export default {
   signup,
   login,
@@ -128,4 +173,9 @@ export default {
   getProfile,
   verifyOTP,
   resendOTP,
+  forgotPassword,
+  resetPassword,
+  changePassword,
 };
+
+

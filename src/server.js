@@ -4,6 +4,7 @@ import { logger } from './utils/logger.js';
 import prisma from './prisma/client.js';
 import { cronQueue } from './jobs/queue.js';
 import { syncActiveJobsToQueue } from './services/cronJobService.js';
+import { initializeCleanupJob, cleanupQueue } from './jobs/cleanupJob.js';
 
 async function startServer() {
   try {
@@ -14,6 +15,9 @@ async function startServer() {
     // Sync active cron jobs to the queue
     const syncedJobs = await syncActiveJobsToQueue();
     logger.info(`Synced ${syncedJobs} active jobs to queue`);
+
+    // Initialize cleanup job scheduler
+    await initializeCleanupJob();
 
     // Start the server
     const server = app.listen(config.port, () => {
@@ -32,7 +36,8 @@ async function startServer() {
 
         try {
           await cronQueue.close();
-          logger.info('Queue closed');
+          await cleanupQueue.close();
+          logger.info('Queues closed');
 
           await prisma.$disconnect();
           logger.info('Database disconnected');
