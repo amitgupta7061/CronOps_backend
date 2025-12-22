@@ -19,6 +19,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.2.0",
     "axios": "^1.13.2",
@@ -35,6 +36,7 @@
     "nodemailer": "^7.0.11",
     "pg": "^8.16.3",
     "swagger-ui-express": "^5.0.1",
+    "ws": "^8.18.3",
     "zod": "^4.2.1"
   },
   "devDependencies": {

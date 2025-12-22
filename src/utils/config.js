@@ -9,6 +9,9 @@ export const config = {
   },
 
   redis: {
+    // Use REDIS_URL for Upstash or other cloud Redis providers
+    url: process.env.REDIS_URL || undefined,
+    // Fallback to individual settings for local Redis
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_PASSWORD || undefined,
