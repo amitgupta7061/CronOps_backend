@@ -11,6 +11,11 @@ import swaggerDocument from './utils/swagger.js';
 
 const app = express();
 
+// Trust proxy for production (Railway, Heroku, etc.)
+if (config.env === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Security middleware
 app.use(helmet());
 

@@ -5,7 +5,14 @@ import { config } from '../utils/config.js';
 const globalForPrisma = globalThis;
 
 function createPrismaClient() {
-  const adapter = new PrismaPg({ connectionString: config.database.url });
+  const adapter = new PrismaPg({
+    connectionString: config.database.url,
+    pool: {
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
+    },
+  });
 
   return new PrismaClient({
     adapter,
